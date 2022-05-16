@@ -1,0 +1,2 @@
+npm install -D node@v17.0.0
+npm install npm@v8.1.0
