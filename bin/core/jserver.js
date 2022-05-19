@@ -3,15 +3,10 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const vhost = require('./jserver/vhost.class');
+const log = require('./jserver/log')
 
 var _CONFIG = '../../config/';
 var sites = [];
-
-function log(event) {
-    fs.appendFile("../../log/jserver.log", event, (err) => {
-        if (err) console.log(err);
-    });
-}
 
 function readVhostConf(file, callback) {
     fs.readFile(_CONFIG+'sites-enable/'+file, "utf-8", (err, data) => {
@@ -37,11 +32,11 @@ function readVhostConf(file, callback) {
                             }
                         }
                         else if (protocol != 'http') {
-                            log('protocol : '+protocol+' to server : '+file+' on config file : '+_CONFIG+file+' at line : '+lineNumber+' isn\'t supported\n')
+                            log.log('protocol : '+protocol+' to server : '+file+' on config file : '+_CONFIG+file+' at line : '+lineNumber+' isn\'t supported')
                         }
                     }
                     catch {
-                        log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"\n');
+                        log.log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"');
                     }
                     break;
 
@@ -53,11 +48,11 @@ function readVhostConf(file, callback) {
                             server.port = parseInt(port);
                         }
                         else {
-                            log('port : '+port.toLowerCase()+' to server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t a valid port\n')
+                            log.log('port : '+port.toLowerCase()+' to server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t a valid port')
                         }
                     }
                     catch {
-                        log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"\n');
+                        log.log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"');
                     }
                     break;
 
@@ -66,7 +61,7 @@ function readVhostConf(file, callback) {
                         server.fqdn = line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "");
                     }
                     catch {
-                        log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"\n');
+                        log.log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"');
                     }
                     break;
 
@@ -74,14 +69,19 @@ function readVhostConf(file, callback) {
                     try {
                         let fileServ = line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "");
                         if (fs.existsSync(fileServ)) {
-                            server.file = fileServ;
+                            if (fileServ[fileServ.length-1] != '/') {
+                                server.file = fileServ+'/';
+                            }
+                            else {
+                                server.file = fileServ;
+                            }
                         }
                         else {
-                            log('file : '+fileServ+' of server : '+file+' on config file : '+_CONFIG+file+' at line : '+lineNumber+' isn\'t exist\n')
+                            log.log('file : '+fileServ+' of server : '+file+' on config file : '+_CONFIG+file+' at line : '+lineNumber+' isn\'t exist')
                         }
                     }
                     catch {
-                        log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"\n');
+                        log.log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"');
                     }
                     break;
 
@@ -93,11 +93,11 @@ function readVhostConf(file, callback) {
                             certif = true;
                         }
                         else {
-                            log('certificate : '+certifFile+' of server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t exist\n')
+                            log.log('certificate : '+certifFile+' of server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t exist')
                         }
                     }
                     catch {
-                        log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"\n');
+                        log.log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"');
                     }
                     break;
 
@@ -109,11 +109,11 @@ function readVhostConf(file, callback) {
                             key = true;
                         }
                         else {
-                            log('key : '+keyFile+' of server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t exist\n')
+                            log.log('key : '+keyFile+' of server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t exist')
                         }
                     }
                     catch {
-                        log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"\n');
+                        log.log('Error on config file :'+_CONFIG+file+' at line : '+lineNumber+' : "'+line[0]+' '+line[line.length-1].toLowerCase().replace(/\n/g, "").replace(/\r/g, "")+'"');
                     }
                     break;
 
@@ -122,7 +122,7 @@ function readVhostConf(file, callback) {
             }
         });
         if ((https && (!certif)) || (https && (!key))) {
-            log('Server : '+file+' is on https but have not SSL certificate or private key\n');
+            log.log('Server : '+file+' is on https but have not SSL certificate or private key');
         }
         else {
             callback(server);
@@ -143,7 +143,6 @@ function puts(error, stdout, stderr) {
         }
     });
 }
-
 exec('ls '+_CONFIG+'sites-enable', puts);
 
 // http.createServer(function (req, res) {

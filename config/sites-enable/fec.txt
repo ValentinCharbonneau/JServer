@@ -1,8 +1,8 @@
 PROTOCOL https
-PORT 3000
+PORT 443
 
 DOMAIN fec.fr
 FILE /home/vagrant
 
-CERTIFICATE /home/vagrant/package.json
-CERTIFICATEKEY /home/vagrant/nodesource_setup.sh
+CERTIFICATE /home/vagrant/ssl/cert.pem
+CERTIFICATEKEY /home/vagrant/ssl/key.pem
