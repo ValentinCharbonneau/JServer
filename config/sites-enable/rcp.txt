@@ -1,7 +1,7 @@
 PROTOCOL https
-PORT 444
+PORT 443
 
-DOMAIN fec.fr
+DOMAIN rcp.fr
 FILE /home/vagrant
 
 CERTIFICATE /home/vagrant/ssl/cert.pem

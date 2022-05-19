@@ -18,6 +18,7 @@ if (workerData.protocol == 'http') {
                     log.log('Enter point \'index.js\' of server : '+workerData.fqdn+' was not found');
                 }
                 _RESPONSE.end();
+                console.log(workerData.fqdn);
             }
         }).listen(workerData.port);
     }

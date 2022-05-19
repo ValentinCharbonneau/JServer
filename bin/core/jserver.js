@@ -6,7 +6,10 @@ const vhost = require('./jserver/vhost.class');
 const log = require('./jserver/log')
 
 var _CONFIG = '../../config/';
-var sites = [];
+var sitesFiles = []
+var sitesWorker = [];
+var portsUsed = [];
+var sslCertificates = [];
 
 function readVhostConf(file, callback) {
     fs.readFile(_CONFIG+'sites-enable/'+file, "utf-8", (err, data) => {
@@ -18,7 +21,7 @@ function readVhostConf(file, callback) {
         let key = false;
         data.split('\n').forEach(line => {
             lineNumber++;
-            line = line.split(' ');
+            line = line.split('#')[0].split(' ');
             switch (line[0]) {
 
                 case 'PROTOCOL':
@@ -29,6 +32,15 @@ function readVhostConf(file, callback) {
                             https = true;
                             if (!portChanged) {
                                 server.port = 443;
+                                if (portsUsed.indexOf(443) == -1) {
+                                    portsUsed.push(443);
+                                }
+                            }
+                        }
+                        else if (protocol == 'http' && !portChanged) {
+                            server.port = 80;
+                            if (portsUsed.indexOf(80) == -1) {
+                                portsUsed.push(80);
                             }
                         }
                         else if (protocol != 'http') {
@@ -46,6 +58,9 @@ function readVhostConf(file, callback) {
                     try {
                         if (parseInt(port)>=0 && parseInt(port)<=65535) {
                             server.port = parseInt(port);
+                            if (portsUsed.indexOf(parseInt(port)) == -1) {
+                                portsUsed.push(parseInt(port));
+                            }
                         }
                         else {
                             log.log('port : '+port.toLowerCase()+' to server : '+file+' on config file :'+_CONFIG+file+' at line : '+lineNumber+' isn\'t a valid port')
@@ -132,12 +147,13 @@ function readVhostConf(file, callback) {
 
 function createWorker(server) {
     let site = new Worker('./jserver/vhost.worker.js', { workerData: server });
-    sites.push(site);
+    sitesWorker.push(site);
 }
 
 const exec = require('child_process').exec;
 function puts(error, stdout, stderr) {
-    stdout.split('\n').forEach(file => {
+    sitesFiles = stdout.split('\n').filter(function(f) { return f !== ' ' });
+    sitesFiles.forEach(file => {
         if (file != '') {
             readVhostConf(file, createWorker);
         }
