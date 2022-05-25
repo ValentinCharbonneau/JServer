@@ -1,5 +1,5 @@
-PROTOCOL https
-PORT 444
+PROTOCOL http
+PORT 80
 
 DOMAIN fec.fr
 FILE /home/vagrant

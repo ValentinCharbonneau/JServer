@@ -1,5 +1,5 @@
-PROTOCOL https
-PORT 443
+PROTOCOL http
+PORT 80
 
 DOMAIN rcp.fr
 FILE /home/vagrant

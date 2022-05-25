@@ -5,61 +5,17 @@ const fs = require('fs');
 const vhost = require('./vhost.class');
 const log = require('./log')
 
-// http server
-if (workerData.protocol == 'http') {
-    try {
-        http.createServer(function (_REQUEST, _RESPONSE) {
-            if (_REQUEST.headers.host == workerData.fqdn) {
-                try {
-                    require(workerData.file+'index.js');
-                }
-                catch {
-                    _RESPONSE.statusCode = 500;
-                    log.log('Enter point \'index.js\' of server : '+workerData.fqdn+' was not found');
-                }
-                _RESPONSE.end();
-                console.log(workerData.fqdn);
-            }
-        }).listen(workerData.port);
-    }
-    catch {
-        log.log('Start of server : '+workerData.fqdn+' was failed');
-    }
-    
-}
-
-
-// https server
-else if (workerData.protocol == 'https') {
-    try {
-        const options = {
-            key: fs.readFileSync(workerData.key),
-            cert: fs.readFileSync(workerData.certificate)
-        };
+http.createServer(function (_REQUEST, _RESPONSE) {
+    if (_REQUEST.headers.host == workerData.server.fqdn) {
         try {
-            https.createServer(options, function (_REQUEST, _RESPONSE) {
-                if (_REQUEST.headers.host == workerData.fqdn) {
-                    try {
-                        require(workerData.file+'index.js');
-                    }
-                    catch {
-                        _RESPONSE.statusCode = 500;
-                        log.log('Enter point \'index.js\' of server : '+workerData.fqdn+' was not found');
-                    }
-                    _RESPONSE.end();
-                }
-            }).listen(workerData.port);
+            require(workerData.server.file+'index.js');
         }
-        catch (error) {
-            log.log('Start of server : '+workerData.fqdn+' was failed');
+        catch {
+            _RESPONSE.statusCode = 500;
+            log.log('Enter point \'index.js\' of server : '+workerData.server.fqdn+' was not found');
         }
+        _RESPONSE.end();
     }
-    catch {
-        log.log("Certificate or private key of "+workerData.fqdn+" doesn't be read");
-    }
-}
-else {
-    log.log("Error for web site : "+workerData.fqdn+" unknown protocol");
-}
+}).listen(workerData.port);
 
-console.log(workerData);
+console.log('worker start');

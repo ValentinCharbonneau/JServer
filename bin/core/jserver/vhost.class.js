@@ -9,6 +9,8 @@ module.exports = {
         
                 this.certificate = '';
                 this.key = '';
+
+                this.internalPort;
             }
         }
 }
